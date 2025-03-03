@@ -1,0 +1,6 @@
+database:
+  dbname: "social_trends"
+  user: "admin"
+  password: "admin123"
+  host: "postgres"
+  port: 5432

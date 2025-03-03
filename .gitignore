@@ -1,0 +1,53 @@
+# Python 관련
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.swp
+.DS_Store
+
+# 환경 설정 파일
+.env
+*.env
+*.venv
+venv/
+Pipfile
+Pipfile.lock
+requirements.txt
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Airflow 관련
+airflow.cfg
+unittests.cfg
+tests/test-*.py
+logs/
+*.log
+*.log.*
+*.out
+*.err
+airflow.db
+airflow-webserver-monitor.pid
+
+# Docker 관련
+**/.dockerignore
+docker-compose.override.yml
+*.tar
+dist/
+build/
+__pycache__/
+*.swp
+
+# 데이터 및 기타 무거운 파일
+*.sqlite3
+*.db
+*.csv
+*.tsv
+*.parquet
+*.h5
+*.feather
+
+# VSCode 설정 파일
+.vscode/
+*.code-workspace

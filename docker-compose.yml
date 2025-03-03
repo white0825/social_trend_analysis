@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  airflow-webserver:
+    build: .  # 커스텀 Dockerfile을 사용하도록 변경
+    image: custom-airflow:latest  # 새 이미지 지정
+    container_name: airflow_webserver
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      - LOAD_EX=n
+      - EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=${AIRFLOW__CORE__SQL_ALCHEMY_CONN}
+    volumes:
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./database:/opt/airflow/database
+      - ./config:/opt/airflow/config  # config 디렉토리 마운트 추가
+      - ./dags:/opt/airflow/dags
+    entrypoint: >
+      /bin/bash -c "
+      echo 'Waiting for config.yaml...';
+      while [ ! -f /opt/airflow/config/config.yaml ]; do sleep 2; done;
+      echo 'config.yaml detected!';
+      airflow db init && airflow webserver"
+    ports:
+      - "8080:8080"
+
+  airflow-scheduler:
+    build: .  # 커스텀 Dockerfile을 사용하도록 변경
+    image: custom-airflow:latest  # 새 이미지 지정
+    container_name: airflow_scheduler
+    restart: always
+    depends_on:
+      - postgres
+      - airflow-webserver
+    environment:
+      - EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=${AIRFLOW__CORE__SQL_ALCHEMY_CONN}
+    volumes:
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./database:/opt/airflow/database
+      - ./config:/opt/airflow/config  # config 디렉토리 마운트 추가
+      - ./dags:/opt/airflow/dags
+    entrypoint: >
+      /bin/bash -c "
+      echo 'Waiting for config.yaml...';
+      while [ ! -f /opt/airflow/config/config.yaml ]; do sleep 2; done;
+      echo 'config.yaml detected!';
+      airflow db upgrade && airflow scheduler"
+
+volumes:
+  postgres_data:
