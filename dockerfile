@@ -10,3 +10,10 @@ USER airflow
 
 # psycopg2 최신 버전 설치
 RUN pip install --no-cache-dir --upgrade psycopg2-binary
+
+# 작업 디렉토리 설정
+WORKDIR /opt/airflow
+
+# requirements.txt 복사 및 패키지 설치
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
